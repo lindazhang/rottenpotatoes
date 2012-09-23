@@ -7,8 +7,26 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    @all_ratings=Movie.ratings 
+    if (session[:sort]=='title' && params[:sort].blank?) || params[:sort] == 'title'
+      @highlight1='hilite'
+      session[:sort] = 'title'
+    elsif (session[:sort] == 'release_date' && params[:sort].blank?)|| params[:sort]=='release_date'
+      @highlight2='hilite'
+      session[:sort] = 'release_date'
+    end
+    if !params[:ratings].blank?
+      session[:ratings] = params[:ratings]
+    end
+    if params[:ratings].blank? || params[:sort].blank?
+      flash.keep
+      redirect_to :action => 'index', :ratings => session[:ratings], :sort => session[:sort]
+    end
+    @movies=Movie.order(session[:sort])
+    @shown_ratings=session[:ratings]
+    @movies= @movies.where(:rating => session[:ratings].keys) if session[:ratings].present?
   end
+
 
   def new
     # default: render 'new' template

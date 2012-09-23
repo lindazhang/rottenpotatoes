@@ -18,7 +18,7 @@ class MoviesController < ApplicationController
     if !params[:ratings].blank?
       session[:ratings] = params[:ratings]
     end
-    if params[:ratings].blank? || params[:sort].blank?
+    if (!session[:ratings].blank? || !session[:sort].blank?) && (params[:ratings].blank? || params[:sort].blank?)
       flash.keep
       redirect_to :action => 'index', :ratings => session[:ratings], :sort => session[:sort]
     end

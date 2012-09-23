@@ -8,6 +8,8 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings=Movie.ratings 
+
+    #if params[:sort] isn't given/save params
     if (session[:sort]=='title' && params[:sort].blank?) || params[:sort] == 'title'
       @highlight1='hilite'
       session[:sort] = 'title'
@@ -15,15 +17,26 @@ class MoviesController < ApplicationController
       @highlight2='hilite'
       session[:sort] = 'release_date'
     end
+
+    #save params[:ratings]
     if !params[:ratings].blank?
       session[:ratings] = params[:ratings]
     end
-    if (!session[:ratings].blank? || !session[:sort].blank?) && (params[:ratings].blank? || params[:sort].blank?)
+
+    #use saved settings
+    if (!session[:ratings].blank? && params[:ratings].blank?)
       flash.keep
       redirect_to :action => 'index', :ratings => session[:ratings], :sort => session[:sort]
     end
+
+    #first time navigating to app
+    if session[:ratings].blank?
+      @shown_ratings=@all_ratings
+    else
+      @shown_ratings=session[:ratings]
+    end
+
     @movies=Movie.order(session[:sort])
-    @shown_ratings=session[:ratings]
     @movies= @movies.where(:rating => session[:ratings].keys) if session[:ratings].present?
   end
 
